@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "gridfs-stream": "^1.1.1",
+    "mongoose": "^8.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  },
+  "scripts": {
+    "start": "node data.js",
+    "dev": "nodemon data.js"
+  }
+}

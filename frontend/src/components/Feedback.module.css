@@ -1,0 +1,26 @@
+.form{
+    margin-top: 50px;
+   margin-left: 100px;
+    backdrop-filter: blur(10px);
+    border: 1px solid;
+    border-radius: 12px;
+   padding: 50px;
+   overflow: hidden;
+}
+.container{
+    margin: 20px;
+    margin-left: 100px;
+}
+@media (max-width:700px) {
+    .form{
+        position: relative;
+      padding: 15px;
+      margin: 0px;
+    }
+    .container{
+display: flex;
+flex-direction: column;
+margin: 0px;
+    }
+
+}

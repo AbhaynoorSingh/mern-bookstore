@@ -1,0 +1,73 @@
+/* body{
+  
+  background-image: url("https://images.unsplash.com/photo-1542911077-46bd18a594f6?q=80&w=2032&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background-repeat: no-repeat;
+  background-position: center;
+
+}
+
+h1{
+  color: #f0f8ff;
+ position: relative;
+ bottom: 0px;
+}
+
+form{
+  border-radius: 10px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+width: 500px;
+  height: 500px;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.541);
+}
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vh;
+  height: 100vh;
+}
+input[type="text"]{
+  width:400px;
+  
+  height: 40px;
+}
+input{
+  color: aliceblue;
+  background-color: #ffffff00;
+  border: none;
+  border-bottom: 2px solid rgb(255, 255, 255);
+}
+
+
+input::placeholder {
+  color: #ffffff;
+  font-style: italic;
+}
+
+input:focus{
+border: none;
+outline: none;
+background-color: none;
+border-bottom: 1px solid white;
+}
+
+input[type="submit"]{
+  background-color: #ffffff;
+  color: black;
+
+  border-radius: 10px;
+  width: 120px;
+  padding: 5px;
+}
+input[type="submit"]:hover{
+  background-color: rgb(0, 136, 255)  ;
+}
+input{
+  width: 380px;
+  margin: 20px;
+}
+ */

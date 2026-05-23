@@ -1,0 +1,4 @@
+to start frontend: npm start
+to start backend: node data.js
+
+admin password: sian123
