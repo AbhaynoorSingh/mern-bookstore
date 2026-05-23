@@ -1,110 +1,242 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function AdminLogin() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [admindata, setUserData] = useState({
-        name: "",
-        password: "",
+  const [admindata, setUserData] = useState({
+    name: "",
+    password: "",
+  });
+
+  const [formErrors, setFormErrors] = useState({});
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setUserData({
+      ...admindata,
+      [name]: value,
     });
+  };
 
-    const [formErrors, setFormErrors] = useState({});
+  const validateForm = () => {
+    const errors = {};
 
-    const [showPassword, setShowPassword] = useState(false);
+    if (!admindata.name) {
+      errors.name = "Please enter your name";
+    }
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
+    if (!admindata.password) {
+      errors.password = "Please enter your password";
+    } else if (admindata.password !== "admin123") {
+      errors.password = "Incorrect password";
+    }
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setUserData({
-            ...admindata,
-            [name]: value,
-        });
-    };
+    setFormErrors(errors);
 
-    const validateForm = () => {
-        const errors = {};
-        if (!admindata.name) {
-            errors.name = "Please enter your name";
-        }
-        if (!admindata.password) {
-            errors.password = "Please enter your password";
-        } else if (admindata.password !== "sian123"){
-            errors.password = "Please enter correct password";
-        }
-        setFormErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
+    return Object.keys(errors).length === 0;
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!validateForm()) {
-            return;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        try {
-            const response = await fetch('http://localhost:8080/admin', {
-                method: 'POST',
-                body: JSON.stringify(admindata),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            const data = await response.json();
-            console.log('Response from server:', data);
-            navigate('/AdminUi');
-        } catch (error) {
-            console.error('Error sending data:', error);
-        }
-    };
+    if (!validateForm()) {
+      return;
+    }
 
-    return (
-        <div style={{ backgroundImage: "URL(https://images.unsplash.com/photo-1508615039623-a25605d2b022?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)" }}>
-            <div className="container" style={{ height: "100vh", width: "100%", justifyContent: "center", alignItems: "center", display: 'flex' }}>
-                <form method="POST" onSubmit={handleSubmit} style={{ padding: "10px", backgroundColor: "#c3c1c1fc", padding: "20px", width: "500px", height: "400px", borderRadius: "12px", alignItems: "center", justifyContent: "center", display: "flex", flexDirection: "column" , margin:"20px", backdropFilter:"blur(20px)" }}>
-                    <h1>Admin Form</h1>
+    try {
+      const response = await fetch("http://localhost:8080/admin", {
+        method: "POST",
+        body: JSON.stringify(admindata),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-                    <input style={{ margin: "10px", padding: "10px", borderRadius: "10px", width: "300px" }}
-                        type="text"
-                        placeholder="Enter your name"
-                        name="name"
-                        value={admindata.name}
-                        onChange={handleChange}
-                    />
-                    {formErrors.name && <p style={{ color: 'red' }}>{formErrors.name}</p>}
+      const data = await response.json();
 
-                    <div style={{display:"flex"}}>
-                        <input style={{ margin: "0px", padding: "10px", borderRadius: "10px", width: "300px", position: "relative", left: "17px" }}
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Enter your password"
-                            name="password"
-                            value={admindata.password}
-                            onChange={handleChange}
-                        />
-                        <button
-                            style={{ backgroundColor: 'transparent', position: 'relative', top: '0px', left: "-20px", border: "none" }}
-                            type="button"
-                            onClick={togglePasswordVisibility}
-                        >
-                            <img
-                                src="https://cdn-icons-png.flaticon.com/128/16527/16527676.png"
-                                alt="Show Password"
-                                style={{ width: '20px', height: '20px' }}
-                            />
-                        </button>
-                    </div>
-                    {formErrors.password && <p style={{ color: 'red' }}>{formErrors.password}</p>}
+      console.log("Response from server:", data);
 
-                    <input type="submit" value="Submit" style={{margin:"10px", backgroundColor: "blue", color: "white", padding: "10px", borderRadius: "10px", width: "80px", textAlign: "center" }} />
+      navigate("/AdminUi");
+    } catch (error) {
+      console.error("Error sending data:", error);
+    }
+  };
 
-                    <Link style={{ margin: "0px" }} to="/">User Login</Link>
-                </form>
-            </div>
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(to right,#0f172a,#1e3a5f)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          width: "420px",
+          padding: "40px",
+          borderRadius: "25px",
+          background: "rgba(255,255,255,0.08)",
+          backdropFilter: "blur(12px)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          border: "1px solid rgba(255,255,255,0.15)",
+        }}
+      >
+        <div className="text-center mb-4">
+          <h1
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "3rem",
+            }}
+          >
+            Admin Login
+          </h1>
+
+          <p
+            style={{
+              color: "#cbd5e1",
+            }}
+          >
+            BOOKSTORE Dashboard
+          </p>
         </div>
-    );
+
+        <form method="POST" onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label
+              style={{
+                color: "white",
+                marginBottom: "8px",
+                display: "block",
+              }}
+            >
+              Username
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter your name"
+              name="name"
+              value={admindata.name}
+              onChange={handleChange}
+              className="form-control"
+              style={{
+                padding: "14px",
+                borderRadius: "14px",
+                border: "none",
+                background: "rgba(255,255,255,0.12)",
+                color: "white",
+              }}
+            />
+
+            {formErrors.name && (
+              <p
+                style={{
+                  color: "#ff6b6b",
+                  marginTop: "5px",
+                }}
+              >
+                {formErrors.name}
+              </p>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label
+              style={{
+                color: "white",
+                marginBottom: "8px",
+                display: "block",
+              }}
+            >
+              Password
+            </label>
+
+            <div className="input-group">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                name="password"
+                value={admindata.password}
+                onChange={handleChange}
+                className="form-control"
+                style={{
+                  padding: "14px",
+                  borderRadius: "14px 0 0 14px",
+                  border: "none",
+                  background: "rgba(255,255,255,0.12)",
+                  color: "white",
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="btn btn-light"
+                style={{
+                  borderRadius: "0 14px 14px 0",
+                  fontWeight: "bold",
+                }}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+
+            {formErrors.password && (
+              <p
+                style={{
+                  color: "#ff6b6b",
+                  marginTop: "5px",
+                }}
+              >
+                {formErrors.password}
+              </p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="btn w-100"
+            style={{
+              background: "linear-gradient(to right,#2563eb,#7c3aed)",
+              color: "white",
+              padding: "14px",
+              borderRadius: "14px",
+              border: "none",
+              fontSize: "18px",
+              fontWeight: "bold",
+              marginTop: "10px",
+            }}
+          >
+            Login
+          </button>
+
+          <div className="text-center mt-4">
+            <Link
+              to="/"
+              style={{
+                color: "#cbd5e1",
+                textDecoration: "none",
+                fontWeight: "500",
+              }}
+            >
+              ← Back to User Login
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default AdminLogin;

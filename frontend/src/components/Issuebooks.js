@@ -1,127 +1,194 @@
-import React from 'react'
-import Usernavbar from "./Usernavbar"
-import { useState, useEffect } from 'react';
-import UserContext from '../Usercontext';
-import { useContext } from 'react';
-import 'aos/dist/aos.css';
-import AOS from 'aos';
-import Aos from 'aos';
+import React, { useEffect, useState, useContext } from "react";
+import Usernavbar from "./Usernavbar";
+import UserContext from "../Usercontext";
+import "aos/dist/aos.css";
+import AOS from "aos";
 
 function Issuebooks() {
-  const { setAcess, Acess, userdata, setuserdata } = useContext(UserContext)
+  const { userdata } = useContext(UserContext);
+
   const [issue, setissue] = useState([]);
-  const [tableDisplay, setTableDisplay] = useState("grid")
-  const [cardDisplay, setCardDisplay] = useState("none")
-  const [buttonTxt, setButtonTxt] = useState("Card")
 
+  const background =
+    "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop";
 
-  const handleTable = () => {
-    if (tableDisplay === "none") {
-      setTableDisplay("grid");
-      setCardDisplay("none")
-      setButtonTxt("Card")
-    } else if (tableDisplay === "grid") {
-      setTableDisplay("none");
-      setCardDisplay("flex")
-      setButtonTxt("Table")
-    }
-  };
+  useEffect(() => {
+    fetchdata();
 
-  const background = "https://t3.ftcdn.net/jpg/04/47/19/30/360_F_447193040_0MTKO703A5olX1bC1lON7F4kHiPKEtte.jpg"
-
-  const card = "https://static.vecteezy.com/system/resources/thumbnails/029/861/640/small_2x/open-book-on-blue-background-back-to-school-concept-copy-space-generative-ai-photo.jpg"
+    AOS.init({
+      duration: 1000,
+    });
+  }, []);
 
   const fetchdata = async () => {
-    const response = await fetch("http://localhost:8080/issuedbooks", {
-      method: "GET"
+    const response = await fetch(
+      `http://localhost:8080/issuedbooks?student=${userdata.name}`,
+      {
+        method: "GET",
+      },
+    );
 
-    })
     const data = await response.json();
-    console.log(data)
+
     setissue(data);
-  }
-  useEffect(() => {
-    fetchdata()
-    AOS.init({duration:"1000"})
-  }, [issue])
+  };
 
   const Returnbook = async (bookid) => {
     const response = await fetch("http://localhost:8080/issuebooksdelete", {
       method: "DELETE",
+
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ _id: bookid })
-    })
+
+      body: JSON.stringify({
+        _id: bookid,
+      }),
+    });
+
     if (response.ok) {
-      console.log("done")
+      fetchdata();
     } else {
-      console.log("error")
+      console.log("error");
     }
-  }
+  };
 
   return (
-    <div style={{ backgroundImage: `url(${background})`, backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "center", height: "100vh" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage: `url(${background})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <Usernavbar />
 
-      <h1 style={{ margin: "20px", textAlign: "center", backdropFilter: "blur(3px)", backgroundColor: "grey",color:"white" }}>Issued by User {userdata.name}</h1>
-      <button type="button" style={{ margin: "10px", maxWidth: "100%" }} onClick={handleTable} class="btn btn-info">View in {buttonTxt}</button>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "rgba(0,0,0,0.65)",
+          paddingBottom: "50px",
+        }}
+      >
+        <div className="container py-5">
+          <div className="text-center text-white mb-5" data-aos="fade-down">
+            <h1
+              style={{
+                fontSize: "4rem",
+                fontWeight: "bold",
+              }}
+            >
+              My Issued Books
+            </h1>
 
-
-      <div style={{ display: tableDisplay }} className="table-responsive" data-aos="fade-down">
-        <table class="table table-dark table-striped">
-          <thead>
-            <tr>
-              <th scope="col">Student</th>
-              <th scope="col">Book_Name</th>
-              <th scope="col">Date</th>
-              <th scope="col">Author</th>
-              <th scope="col">Price</th>
-              <th scope="col">Issued</th>
-              <th scope="col">Return</th>
-
-
-            </tr>
-          </thead>
-          <tbody>
-            {issue.map((data, index) => (
-              <tr key={index}>
-                <td>{data.student}</td>
-                <td>{data.name}</td>
-                <td>{data.date}</td>
-                <td>{data.author}</td>
-                <td>{data.price}</td>
-                <td>YES</td>
-                <td>
-                  <button onClick={() => Returnbook(data._id)} type="button" className="btn btn-outline-warning">Return</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div style={{ display: cardDisplay }} class="row row-cols-2 row-cols-md-3 g-0">
-        {issue.map((data, index) => (
-          <div>
-            <div className="card" style={{ margin: "12px", backgroundImage: `url(${card})`, backgroundPosition: "center", boxShadow: '12px 12px 12px rgba(0, 0, 0, 0.1)' }}>
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", backdropFilter: "blur(2px)" }} className="card-body">
-                <h5 className="card-title"> {data.name}</h5>
-                <h5 className="card-title"> {data.date}</h5>
-                <h5 className="card-title"> {data.author}</h5>
-                <h5 className="card-title"> {data.price}$ </h5>
-                <button onClick={() => Returnbook(data._id)} type="button" className="btn btn-outline-warning">Return</button>
-
-
-              </div>
-
-            </div>
-
+            <p
+              style={{
+                fontSize: "1.2rem",
+                opacity: "0.8",
+              }}
+            >
+              Welcome back, {userdata.name}
+            </p>
           </div>
 
-        ))}
+          {issue.length === 0 ? (
+            <div
+              className="text-center text-white"
+              style={{
+                marginTop: "100px",
+              }}
+            >
+              <h2>No books issued yet 📚</h2>
+            </div>
+          ) : (
+            <div className="row">
+              {issue.map((data, index) => (
+                <div
+                  className="col-lg-4 col-md-6 mb-4"
+                  key={index}
+                  data-aos="zoom-in"
+                >
+                  <div
+                    className="card h-100"
+                    style={{
+                      borderRadius: "25px",
+                      overflow: "hidden",
+                      border: "none",
+                      background: "rgba(255,255,255,0.12)",
+                      backdropFilter: "blur(12px)",
+                      color: "white",
+                      boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "220px",
+                        backgroundImage:
+                          "url(https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1974&auto=format&fit=crop)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    ></div>
+
+                    <div className="card-body">
+                      <h3
+                        className="card-title"
+                        style={{
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {data.name}
+                      </h3>
+
+                      <hr style={{ color: "white" }} />
+
+                      <p>
+                        <strong>Author:</strong> {data.author}
+                      </p>
+
+                      <p>
+                        <strong>Published:</strong> {data.date}
+                      </p>
+
+                      <p>
+                        <strong>Price:</strong> ₹{data.price}
+                      </p>
+
+                      <div className="mb-3">
+                        <span
+                          className="badge bg-success"
+                          style={{
+                            padding: "10px",
+                            fontSize: "14px",
+                          }}
+                        >
+                          Issued Successfully
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => Returnbook(data._id)}
+                        className="btn btn-warning w-100"
+                        style={{
+                          borderRadius: "12px",
+                          padding: "12px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Return Book
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Issuebooks
+export default Issuebooks;

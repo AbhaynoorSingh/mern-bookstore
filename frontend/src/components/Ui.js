@@ -1,221 +1,250 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from "react";
 import Usernavbar from "./Usernavbar";
-import UserContext from '../Usercontext';
-import 'aos/dist/aos.css';
-import AOS from 'aos';
+import UserContext from "../Usercontext";
+import "aos/dist/aos.css";
+import AOS from "aos";
 
 function Ui() {
-  const { setAcess, Acess, userdata } = useContext(UserContext);
+  const { userdata } = useContext(UserContext);
+
   const [data, setData] = useState([]);
   const [pendingBooks, setPendingBooks] = useState({});
-  const [image, setimage] = useState()
-  const [searchdata, setsearchdata] = useState("")
-  const [finddata, setfinddata] = useState([])
-  const[tableDisplay,setTableDisplay]=useState("grid")
-  const[cardDisplay,setCardDisplay]=useState("none")
-  const[buttonTxt,setButtonTxt]=useState("Card")
- 
+  const [searchdata, setsearchdata] = useState("");
+  const [finddata, setfinddata] = useState([]);
 
-  const handleTable = () => {
-    if (tableDisplay === "none") {
-      setTableDisplay("grid");
-      setCardDisplay("none")
-      setButtonTxt("Card")
-    } else if (tableDisplay === "grid") {
-      setTableDisplay("none");
-      setCardDisplay("flex")
-      setButtonTxt("Table")
-    }
-  };
-console.log(tableDisplay)
-
-
-  const background="https://t3.ftcdn.net/jpg/04/47/19/30/360_F_447193040_0MTKO703A5olX1bC1lON7F4kHiPKEtte.jpg"
-
-  const card = "https://static.vecteezy.com/system/resources/thumbnails/029/861/640/small_2x/open-book-on-blue-background-back-to-school-concept-copy-space-generative-ai-photo.jpg"
-  
-
-  const images = () => {
-    setimage("https://media.tenor.com/Jf0DeFnXWw0AAAAM/books-reading.gif")
-  }
-
-
-  const fetchData = async () => {
-    const response = await fetch("http://localhost:8080/allbooks", {
-      method: "GET"
-    });
-    const result = await response.json();
-    console.log(result);
-    setData(result);
-  };
+  const background =
+    "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop";
 
   useEffect(() => {
     fetchData();
-    images()
-    AOS.init({ duration: 1000 })
+
+    AOS.init({
+      duration: 1000,
+    });
   }, []);
+
+  const fetchData = async () => {
+    const response = await fetch("http://localhost:8080/allbooks", {
+      method: "GET",
+    });
+
+    const result = await response.json();
+
+    setData(result);
+  };
 
   const requestBook = async (name, date, author, price, index, student) => {
     const response = await fetch("http://localhost:8080/requestIssue", {
       method: "POST",
+
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, date, author, price, student })
+
+      body: JSON.stringify({
+        name,
+        date,
+        author,
+        price,
+        student,
+      }),
     });
+
     const result = await response.json();
+
     console.log(result);
-    setPendingBooks(prevState => ({
+
+    setPendingBooks((prevState) => ({
       ...prevState,
-      [index]: "Request Pending"
+      [index]: "Pending",
     }));
   };
 
-  let style = {
-    fontSize: "20px"
-  }
-
   const handelchange = (e) => {
     const { name, value } = e.target;
+
     setsearchdata({
       ...searchdata,
       [name]: value,
     });
-  }
-  console.log(searchdata)
+  };
 
   const submit = async (e) => {
-    e.preventDefault()
-    const response = await fetch(`http://localhost:8080/search?name=${encodeURIComponent(searchdata.name)}`, {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    const data = await response.json();
-    console.log("data", data)
-    setfinddata(data);
-    console.log("fetch", response)
-  }
+    e.preventDefault();
+
+    const response = await fetch(
+      `http://localhost:8080/search?name=${encodeURIComponent(searchdata.name)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    setfinddata(result);
+  };
+
+  const booksToDisplay = finddata.length > 0 ? finddata : data;
 
   return (
-    <div style={{backgroundImage:`url(${background})`,backgroundRepeat:"no-repeat",backgroundSize:"cover",backgroundPosition:"center",height:"100vh"}}>
-
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage: `url(${background})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <Usernavbar />
 
-       
-      <form style={{margin:"20px"}} className="d-flex" role="search" method='GET' onSubmit={submit}>
-        <input
-          className="form-control me-2"
-          type="search"
-          placeholder="Search books"
-          aria-label="Search"
-          name="name"
-          value={searchdata.name}
-          onChange={handelchange}
-        />
-        <button className="btn btn-outline-success" type="submit">
-          Search 
-        </button>
-      </form>
-      
-      <table className="table">
-        <thead className="table">
-          </thead>
-        <tbody>
-          {finddata.map((book, index) => (
-            
+      <div
+        className="container-fluid"
+        style={{
+          background: "rgba(0,0,0,0.6)",
+          minHeight: "100vh",
+          paddingBottom: "50px",
+        }}
+      >
+        <div className="container py-5">
+          <div className="text-center text-white mb-5" data-aos="fade-down">
+            <h1
+              style={{
+                fontSize: "4rem",
+                fontWeight: "bold",
+              }}
+            >
+              Welcome {userdata.name}
+            </h1>
 
-            <tr key={index}>
-             <td > {<img style={{ height: "50px" }} src={image} alt="loading" />}</td>
-              <td >{book.name}</td>
-              <td >{book.date}</td>
-              <td >{book.author}</td>
-              <td >{book.price}$</td>
-              <td>
-              <button style={{ marginTop: "7px" }}
-                  onClick={() => requestBook(book.name, book.date, book.author, book.price, index, userdata.name)}
-                  className="btn btn-outline-success"
+            <p
+              style={{
+                fontSize: "1.2rem",
+                opacity: "0.8",
+              }}
+            >
+              Explore your digital BOOKSTORE
+            </p>
+          </div>
+
+          <form
+            className="d-flex mb-5"
+            role="search"
+            method="GET"
+            onSubmit={submit}
+          >
+            <input
+              className="form-control form-control-lg me-3"
+              type="search"
+              placeholder="Search your favorite books..."
+              aria-label="Search"
+              name="name"
+              value={searchdata.name}
+              onChange={handelchange}
+              style={{
+                borderRadius: "15px",
+                border: "none",
+                padding: "15px",
+              }}
+            />
+
+            <button
+              className="btn btn-success btn-lg"
+              type="submit"
+              style={{
+                borderRadius: "15px",
+                width: "140px",
+              }}
+            >
+              Search
+            </button>
+          </form>
+
+          <div className="row">
+            {booksToDisplay.map((book, index) => (
+              <div
+                className="col-lg-4 col-md-6 mb-4"
+                key={index}
+                data-aos="zoom-in"
+              >
+                <div
+                  className="card h-100"
+                  style={{
+                    borderRadius: "25px",
+                    overflow: "hidden",
+                    border: "none",
+                    background: "rgba(255,255,255,0.1)",
+                    backdropFilter: "blur(12px)",
+                    color: "white",
+                    boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+                    transition: "0.3s",
+                  }}
                 >
-                  {pendingBooks[index] || "Request Issue"}
-                </button>
-              </td>
-            </tr>
-          ))}
-           
-        </tbody>
-      </table>
+                  <div
+                    style={{
+                      height: "220px",
+                      backgroundImage:
+                        "url(https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1974&auto=format&fit=crop)",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  ></div>
 
-      <h1 style={{ textAlign: "center", margin: "30px,0px,0px,0px", backgroundColor: "grey", color: "white" }}>Available Books</h1>
-      
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <div className="card-body">
+                    <h3
+                      className="card-title"
+                      style={{
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {book.name}
+                    </h3>
 
-  <button type="button" style={{margin:"10px",width:"100px"}} onClick={handleTable} class="btn btn-info">View in {buttonTxt}</button>
-</div>
-      <div  style={{display:tableDisplay}} className="table-responsive " data-aos="zoom-in-down">
-      <table className="table">
-        <thead className="table-light">
-          <tr>
-            <th scope="col">images</th>
-            <th scope="col">Book_Name</th>
-            <th scope="col">Date</th>
-            <th scope="col">Author</th>
-            <th scope="col">Price</th>
-            <th scope="col">Issue</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((book, index) => (
-            <tr key={index}>
-              <td > {<img style={{ height: "50px" }} src={image} alt="loading" />}</td>
-              <td style={style}>{book.name}</td>
-              <td style={style}>{book.date}</td>
-              <td style={style}>{book.author}</td>
-              <td style={style}>{book.price}$</td>
-              <td style={style}>
-                <button style={{ marginTop: "7px" }}
-                  onClick={() => requestBook(book.name, book.date, book.author, book.price, index, userdata.name)}
-                  className="btn btn-outline-success"
-                >
-                  {pendingBooks[index] || "Request Issue"}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      
-</div>
-<div  style={{display:cardDisplay}} class="row row-cols-2 row-cols-md-3 g-0">
-  
+                    <hr style={{ color: "white" }} />
 
+                    <p className="card-text">
+                      <strong>Author:</strong> {book.author}
+                    </p>
 
-{data.map((book,index)=>(
-  <div>
-<div  className="card" style={{margin:"12px",backgroundImage:`url(${card})`,backgroundPosition:"center", boxShadow: '12px 12px 12px rgba(0, 0, 0, 0.1)'}}>
-  <div style={{display:"flex",flexDirection:"column",justifyContent:"center",backdropFilter:"blur(2px)"}} className="card-body">
-    <h5 className="card-title"> {book.name}</h5>
-    <h5 className="card-title"> {book.date}</h5>
-    <h5 className="card-title"> {book.author}</h5>
-    <h5 className="card-title"> {book.price}$ </h5>
-    <button style={{ marginTop: "7px" }}
-                  onClick={() => requestBook(book.name, book.date, book.author, book.price, index, userdata.name)}
-                  className="btn btn-outline-success"
-                >
-                  {pendingBooks[index] || "Request Issue"}
-                </button>
-    
-  </div>
-  
- </div>
+                    <p className="card-text">
+                      <strong>Published:</strong> {book.date}
+                    </p>
 
+                    <p className="card-text">
+                      <strong>Price:</strong> ₹{book.price}
+                    </p>
+
+                    <button
+                      onClick={() =>
+                        requestBook(
+                          book.name,
+                          book.date,
+                          book.author,
+                          book.price,
+                          index,
+                          userdata.name,
+                        )
+                      }
+                      className="btn btn-success w-100 mt-3"
+                      style={{
+                        borderRadius: "12px",
+                        padding: "12px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {pendingBooks[index] || "Request Issue"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
-
-))}
-
-</div>
-</div>
-   
   );
 }
 

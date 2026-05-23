@@ -1,110 +1,201 @@
-import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import UserContext from '../Usercontext';
+import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import UserContext from "../Usercontext";
 
 function Userlogin() {
-
-  const { userdata, setuserdata } = useContext(UserContext)
-  const [error, seterror] = useState({})
+  const { userdata, setuserdata } = useContext(UserContext);
+  const [error, seterror] = useState({});
   const navigate = useNavigate();
 
   const validateForm = () => {
-    const errors = {}
-let isvalid = true;
+    const errors = {};
+    let isvalid = true;
 
     if (!userdata.name) {
-      errors.name = "fill the username"
-       isvalid= false;
+      errors.name = "fill the username";
+      isvalid = false;
     } else if (!userdata.age) {
-      errors.age = "fill the age"
-       isvalid= false;
+      errors.age = "fill the age";
+      isvalid = false;
+    } else if (!userdata.phoneno || userdata.phoneno.length < 9) {
+      errors.phoneno = "fill the phoneno";
+      isvalid = false;
     }
-    else if (!userdata.phoneno || userdata.phoneno.length<9) {
-      errors.phoneno = "fill the phoneno"
-       isvalid= false;
-    }
-    seterror(errors)
+    seterror(errors);
 
-   return isvalid 
-  }
-
+    return isvalid;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setuserdata({
       ...userdata,
-      [name]: value
+      [name]: value,
     });
-    console.log(userdata)
+    console.log(userdata);
   };
 
   const handelsubmit = async (e) => {
     e.preventDefault();
     console.log(userdata);
 
-    validateForm()
+    validateForm();
     if (!validateForm()) {
       return;
     }
     try {
-      navigate('/Ui')
+      navigate("/Ui");
       const response = await fetch("http://localhost:8080/user", {
         method: "POST",
         body: JSON.stringify(userdata),
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
       const data = await response.json();
-      console.log('response from server', data);
-
-
+      console.log("response from server", data);
     } catch (err) {
-      console.log('error sending data', err);
+      console.log("error sending data", err);
     }
   };
 
   return (
-    <div style={{ padding: '20px', backgroundImage: 'url(https://images.unsplash.com/photo-1508615039623-a25605d2b022?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)', backgroundPosition: "center", height: "100vh", backgroundRepeat: "no-repeat" }}>
-      <div className="container" style={{ maxWidth: '600px', margin: '150px  auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
-        <form method='Post' onSubmit={handelsubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <h1 style={{ textAlign: 'center' }}>Student Form</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background:
+          "linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #6dd5ed 100%)",
+        padding: "20px",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "450px",
+          background: "rgba(255,255,255,0.15)",
+          backdropFilter: "blur(12px)",
+          borderRadius: "20px",
+          padding: "40px",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          border: "1px solid rgba(255,255,255,0.2)",
+        }}
+      >
+        <form
+          method="Post"
+          onSubmit={handelsubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "18px",
+          }}
+        >
+          <h1
+            style={{
+              textAlign: "center",
+              color: "white",
+              fontWeight: "bold",
+              marginBottom: "10px",
+            }}
+          >
+            BOOKSTORE
+          </h1>
+
+          <p
+            style={{
+              textAlign: "center",
+              color: "#f1f1f1",
+              marginBottom: "20px",
+            }}
+          >
+            Student Login Portal
+          </p>
 
           <input
-            type='text'
-            placeholder='Enter your name'
-            name='name'
+            type="text"
+            placeholder="Enter your name"
+            name="name"
             value={userdata.name}
             onChange={handleChange}
-            style={{ padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
-          {error.name && <span style={{ color: 'red' }}>{error.name}</span>}
-          <input
-            type='number'
-            placeholder='Enter your Age'
-            name='age'
-            value={userdata.age}
-            onChange={handleChange}
-            style={{ padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
-  {error.age && <span style={{ color: 'red' }}>{error.age}</span>}
-          <input
-            type='tel'
-            placeholder='Enter your phoneno'
-            name='phoneno'
-            value={userdata.phoneno}
-            onChange={handleChange}
-            style={{ padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
- {error.phoneno && <span style={{ color: 'red' }}>{error.phoneno}</span>}
-          <input
-            type="submit"
-            value="Login"
-            style={{ padding: '10px', fontSize: '16px', borderRadius: '5px', border: '1px solid #ccc', cursor: 'pointer', backgroundColor: '#4CAF50', color: 'white' }}
+            style={{
+              padding: "14px",
+              borderRadius: "10px",
+              border: "none",
+              outline: "none",
+              fontSize: "16px",
+            }}
           />
 
-          <Link to="/AdminLogin" style={{ textAlign: 'center', textDecoration: 'none', color: '#007BFF' }}>Admin login</Link>
+          {error.name && <span style={{ color: "#ffb3b3" }}>{error.name}</span>}
+
+          <input
+            type="number"
+            placeholder="Enter your Age"
+            name="age"
+            value={userdata.age}
+            onChange={handleChange}
+            style={{
+              padding: "14px",
+              borderRadius: "10px",
+              border: "none",
+              outline: "none",
+              fontSize: "16px",
+            }}
+          />
+
+          {error.age && <span style={{ color: "#ffb3b3" }}>{error.age}</span>}
+
+          <input
+            type="tel"
+            placeholder="Enter your phone number"
+            name="phoneno"
+            value={userdata.phoneno}
+            onChange={handleChange}
+            style={{
+              padding: "14px",
+              borderRadius: "10px",
+              border: "none",
+              outline: "none",
+              fontSize: "16px",
+            }}
+          />
+
+          {error.phoneno && (
+            <span style={{ color: "#ffb3b3" }}>{error.phoneno}</span>
+          )}
+
+          <button
+            type="submit"
+            style={{
+              padding: "14px",
+              borderRadius: "10px",
+              border: "none",
+              background: "#00c853",
+              color: "white",
+              fontSize: "17px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "0.3s",
+            }}
+          >
+            Login
+          </button>
+
+          <Link
+            to="/AdminLogin"
+            style={{
+              textAlign: "center",
+              textDecoration: "none",
+              color: "white",
+              fontWeight: "500",
+              marginTop: "10px",
+            }}
+          >
+            Admin Login
+          </Link>
         </form>
       </div>
     </div>
