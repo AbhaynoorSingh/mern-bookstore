@@ -3,9 +3,12 @@ import AdminNavbar from "./AdminNavbar";
 
 function Allbooks() {
   const [books, setBooks] = useState([]);
-  const [searchData, setSearchData] = useState("");
+  const [searchData, setSearchData] = useState({
+    name: "",
+  });
   const [findData, setFindData] = useState([]);
-  const [iDisplay, setDisplay] = useState("none");
+  const [searched, setSearched] = useState(false);
+  const [message, setMessage] = useState("");
 
   const [update, setUpdate] = useState({
     id: "",
@@ -43,7 +46,11 @@ function Allbooks() {
       console.error("Error deleting resource:", errData);
     } else {
       console.log("All books deleted");
+      setMessage("Books deleted successfully!");
 
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
       fetchData();
     }
   };
@@ -63,8 +70,14 @@ function Allbooks() {
       console.error("Error deleting resource:", errData);
     } else {
       console.log("Book deleted");
+      setMessage("Book deleted successfully!");
 
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
       fetchData();
+
+      setFindData((prev) => prev.filter((book) => book._id !== bookId));
     }
   };
 
@@ -75,10 +88,20 @@ function Allbooks() {
       ...searchData,
       [name]: value,
     });
+
+    if (value === "") {
+      setSearched(false);
+    }
   };
 
   const submit = async (e) => {
     e.preventDefault();
+
+    if (!searchData.name || searchData.name.trim() === "") {
+      setSearched(false);
+      setFindData([]);
+      return;
+    }
 
     const response = await fetch(
       `http://localhost:8080/search?name=${encodeURIComponent(searchData.name)}`,
@@ -93,12 +116,7 @@ function Allbooks() {
     const data = await response.json();
 
     setFindData(data);
-
-    if (data.length > 0) {
-      setDisplay("contents");
-    } else {
-      setDisplay("none");
-    }
+    setSearched(true);
   };
 
   const handleUpdateChange = (e) => {
@@ -135,6 +153,12 @@ function Allbooks() {
     });
 
     if (response.ok) {
+      setMessage("Book updated successfully!");
+
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
+
       fetchData();
 
       setUpdate({
@@ -159,6 +183,24 @@ function Allbooks() {
         paddingBottom: "40px",
       }}
     >
+      {message && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            backgroundColor: "#22c55e",
+            color: "white",
+            padding: "12px 20px",
+            borderRadius: "10px",
+            zIndex: "999",
+            fontWeight: "bold",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          }}
+        >
+          {message}
+        </div>
+      )}
       <AdminNavbar />
 
       <div className="container py-4">
@@ -184,36 +226,6 @@ function Allbooks() {
           </button>
         </form>
 
-        <table
-          style={{
-            display: iDisplay,
-            background: "white",
-            borderRadius: "10px",
-            overflow: "hidden",
-          }}
-          className="table table-hover"
-        >
-          <thead className="table-dark">
-            <tr>
-              <th>Book Name</th>
-              <th>Date</th>
-              <th>Author</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {findData.map((book, index) => (
-              <tr key={index}>
-                <td>{book.name}</td>
-                <td>{book.date}</td>
-                <td>{book.author}</td>
-                <td>₹{book.price}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
         <h1
           style={{
             textAlign: "center",
@@ -236,8 +248,25 @@ function Allbooks() {
           </button>
         </div>
 
+        {searched && findData.length === 0 && (
+          <h3
+            style={{
+              color: "white",
+              textAlign: "center",
+              marginTop: "30px",
+            }}
+          >
+            No books found 📚
+          </h3>
+        )}
+
         <div className="row">
-          {books.map((book, index) => (
+          {(Array.isArray(searched ? findData : books)
+            ? searched
+              ? findData
+              : books
+            : []
+          ).map((book, index) => (
             <div className="col-md-4 mb-4" key={index}>
               <div
                 className="card h-100"

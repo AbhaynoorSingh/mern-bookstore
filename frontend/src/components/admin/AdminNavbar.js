@@ -52,7 +52,7 @@ function Navbar() {
 
             <li className="nav-item">
               <Link className="nav-link" to="/Students">
-                Students
+                Users
               </Link>
             </li>
 

@@ -111,7 +111,7 @@ function Userlogin() {
               marginBottom: "20px",
             }}
           >
-            Student Login Portal
+            User Login Portal
           </p>
 
           <input

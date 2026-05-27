@@ -55,7 +55,7 @@ function Students() {
               fontSize: "3rem",
             }}
           >
-            Students
+            Users 
           </h1>
 
           <div
@@ -67,14 +67,14 @@ function Students() {
               backdropFilter: "blur(10px)",
             }}
           >
-            Total Students : <strong>{students.length}</strong>
+            Total Users : <strong>{students.length}</strong>
           </div>
         </div>
 
         <div className="mb-4">
           <input
             type="text"
-            placeholder="Search students..."
+            placeholder="Search Users..."
             className="form-control"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -104,7 +104,7 @@ function Students() {
                 }}
               >
                 <th>#</th>
-                <th>Student Name</th>
+                <th>User Name</th>
                 <th>Age</th>
                 <th>Phone Number</th>
               </tr>

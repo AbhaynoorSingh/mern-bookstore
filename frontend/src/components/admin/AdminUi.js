@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AdminNavbar from "./AdminNavbar";
 
 function AdminUi() {
@@ -6,11 +6,30 @@ function AdminUi() {
     { name: "", date: "", author: "", price: "" },
   ]);
 
+  const [message, setMessage] = useState("");
+
+  const [totalBooks, setTotalBooks] = useState(0);
+
   const handleInputChange = (index, field, value) => {
     const newRows = [...rows];
     newRows[index][field] = value;
     setRows(newRows);
   };
+
+  const fetchTotalBooks = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/allbooks");
+      const data = await response.json();
+
+      setTotalBooks(data.length);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalBooks();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +49,14 @@ function AdminUi() {
 
       const result = await response.json();
       console.log("Success:", result);
+      fetchTotalBooks();
+      setMessage("Book added successfully!");
+
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
+
+      setRows([{ name: "", date: "", author: "", price: "" }]);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -44,6 +71,25 @@ function AdminUi() {
       }}
     >
       <AdminNavbar />
+
+      {message && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            backgroundColor: "#00c853",
+            color: "white",
+            padding: "15px 25px",
+            borderRadius: "10px",
+            fontWeight: "bold",
+            zIndex: "9999",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          }}
+        >
+          {message}
+        </div>
+      )}
 
       <div className="container py-5">
         <div
@@ -76,7 +122,7 @@ function AdminUi() {
                   color: "white",
                 }}
               >
-                <h2>{rows.length}</h2>
+                <h2>{totalBooks}</h2>
                 <p>Total Books Added</p>
               </div>
             </div>
@@ -91,7 +137,7 @@ function AdminUi() {
                 }}
               >
                 <h2>BOOKSTORE</h2>
-                <p>Management System</p>
+                <p>Application</p>
               </div>
             </div>
 

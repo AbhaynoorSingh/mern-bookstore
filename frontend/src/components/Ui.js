@@ -11,19 +11,23 @@ function Ui() {
   const [pendingBooks, setPendingBooks] = useState({});
   const [searchdata, setsearchdata] = useState("");
   const [finddata, setfinddata] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searched, setSearched] = useState(false);
 
   const background =
-    "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2070&auto=format&fit=crop";
+    "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=900&auto=format&fit=crop";
 
   useEffect(() => {
     fetchData();
 
     AOS.init({
-      duration: 1000,
+      duration: 400,
     });
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
+
     const response = await fetch("http://localhost:8080/allbooks", {
       method: "GET",
     });
@@ -31,6 +35,8 @@ function Ui() {
     const result = await response.json();
 
     setData(result);
+
+    setLoading(false);
   };
 
   const requestBook = async (name, date, author, price, index, student) => {
@@ -67,27 +73,31 @@ function Ui() {
       ...searchdata,
       [name]: value,
     });
+
+    // if search becomes empty show all books again
+    if (value.trim() === "") {
+      setfinddata([]);
+      setSearched(false);
+    }
   };
 
-  const submit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
 
-    const response = await fetch(
-      `http://localhost:8080/search?name=${encodeURIComponent(searchdata.name)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
+    const filteredBooks = data.filter((book) =>
+      book.name.toLowerCase().includes(searchdata.name.toLowerCase()),
     );
 
-    const result = await response.json();
-
-    setfinddata(result);
+    setfinddata(filteredBooks);
+    setSearched(true);
   };
 
-  const booksToDisplay = finddata.length > 0 ? finddata : data;
+  const booksToDisplay =
+    searchdata.name && finddata.length === 0
+      ? []
+      : finddata.length > 0
+        ? finddata
+        : data;
 
   return (
     <div
@@ -164,83 +174,93 @@ function Ui() {
           </form>
 
           <div className="row">
-            {booksToDisplay.map((book, index) => (
-              <div
-                className="col-lg-4 col-md-6 mb-4"
-                key={index}
-                data-aos="zoom-in"
-              >
+            {loading ? (
+              <div className="text-center text-white mt-5">
+                <h2>Loading Books...</h2>
+              </div>
+            ) : searched && booksToDisplay.length === 0 ? (
+              <div className="text-center text-white mt-5">
+                <h2>No Books Found 📚</h2>
+              </div>
+            ) : (
+              booksToDisplay.map((book, index) => (
                 <div
-                  className="card h-100"
-                  style={{
-                    borderRadius: "25px",
-                    overflow: "hidden",
-                    border: "none",
-                    background: "rgba(255,255,255,0.1)",
-                    backdropFilter: "blur(12px)",
-                    color: "white",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
-                    transition: "0.3s",
-                  }}
+                  className="col-lg-4 col-md-6 mb-4"
+                  key={book._id}
+                  data-aos="zoom-in"
                 >
                   <div
+                    className="card h-100"
                     style={{
-                      height: "220px",
-                      backgroundImage:
-                        "url(https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1974&auto=format&fit=crop)",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
+                      borderRadius: "25px",
+                      overflow: "hidden",
+                      border: "none",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(6px)",
+                      color: "white",
+                      boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
+                      transition: "0.3s",
                     }}
-                  ></div>
-
-                  <div className="card-body">
-                    <h3
-                      className="card-title"
+                  >
+                    <div
                       style={{
-                        fontWeight: "bold",
+                        height: "220px",
+                        backgroundImage:
+                          "url(https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=700&auto=format&fit=crop)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
                       }}
-                    >
-                      {book.name}
-                    </h3>
+                    ></div>
 
-                    <hr style={{ color: "white" }} />
+                    <div className="card-body">
+                      <h3
+                        className="card-title"
+                        style={{
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {book.name}
+                      </h3>
 
-                    <p className="card-text">
-                      <strong>Author:</strong> {book.author}
-                    </p>
+                      <hr style={{ color: "white" }} />
 
-                    <p className="card-text">
-                      <strong>Published:</strong> {book.date}
-                    </p>
+                      <p className="card-text">
+                        <strong>Author:</strong> {book.author}
+                      </p>
 
-                    <p className="card-text">
-                      <strong>Price:</strong> ₹{book.price}
-                    </p>
+                      <p className="card-text">
+                        <strong>Published:</strong> {book.date}
+                      </p>
 
-                    <button
-                      onClick={() =>
-                        requestBook(
-                          book.name,
-                          book.date,
-                          book.author,
-                          book.price,
-                          index,
-                          userdata.name,
-                        )
-                      }
-                      className="btn btn-success w-100 mt-3"
-                      style={{
-                        borderRadius: "12px",
-                        padding: "12px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {pendingBooks[index] || "Request Issue"}
-                    </button>
+                      <p className="card-text">
+                        <strong>Price:</strong> ₹{book.price}
+                      </p>
+
+                      <button
+                        onClick={() =>
+                          requestBook(
+                            book.name,
+                            book.date,
+                            book.author,
+                            book.price,
+                            index,
+                            userdata.name,
+                          )
+                        }
+                        className="btn btn-success w-100 mt-3"
+                        style={{
+                          borderRadius: "12px",
+                          padding: "12px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {pendingBooks[index] || "Request Issue"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
